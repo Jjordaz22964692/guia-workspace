@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Maestra de Google Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .slide.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-content::-webkit-scrollbar { width: 8px; }
+        .slide-content::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .slide-content::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        .slide-content::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .interactive-choice, .path-choice {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-choice:hover, .path-choice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        #navigation-bar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="height: 650px;">
+        
+        <!-- Slides Container -->
+        <div id="slides-container" class="flex-grow p-6 sm:p-10 overflow-y-auto slide-content">
+            
+            <!-- Slide 0: Path Selection -->
+            <div class="slide active" data-path="home">
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                    <div class="bg-blue-600 text-white p-4 rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>
+                    </div>
+                    <h1 class="text-4xl font-bold text-slate-800">Guía Maestra de Google Workspace</h1>
+                    <p class="mt-4 text-slate-600 text-lg">Para comenzar, por favor selecciona tu rol:</p>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-md">
+                        <div id="path-member" class="path-choice p-6 border rounded-lg cursor-pointer text-center">
+                            <h2 class="text-xl font-bold text-slate-800">Nuevo Miembro del Equipo</h2>
+                            <p class="text-sm text-slate-500 mt-2">Aprende a usar nuestras herramientas de colaboración desde cero.</p>
+                        </div>
+                        <div id="path-leader" class="path-choice p-6 border rounded-lg cursor-pointer text-center">
+                            <h2 class="text-xl font-bold text-slate-800">Líder de Área</h2>
+                            <p class="text-sm text-slate-500 mt-2">Aprende a gestionar, organizar y liderar a tu equipo en Workspace.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBER PATH SLIDES -->
+            <div class="slide" data-path="member">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-6">El Panorama General: Dos Mundos Diferentes</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-slate-50 rounded-lg border">
+                        <h3 class="text-2xl font-bold text-slate-700 mb-3">Mi Unidad</h3>
+                        <p class="mb-4 text-slate-600">Tu espacio de trabajo **personal**.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span><span>Borradores y documentos personales.</span></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span><span>Archivos que solo tú necesitas.</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong class="font-semibold">NO</strong> es para archivos críticos del equipo.</span></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-blue-50 rounded-lg border border-blue-300">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-3">Unidades Compartidas</h3>
+                        <p class="mb-4 text-blue-700">La biblioteca y cerebro **del equipo**.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Documentos de proyectos y departamentos.</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Información que debe perdurar.</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Nuestra fuente única de verdad.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slide" data-path="member">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-4">¡Ponte a Prueba! #1</h2>
+                <p class="text-lg text-slate-600 mb-8">Estás trabajando en el reporte financiero trimestral que todo el departamento necesita. ¿Dónde lo guardas?</p>
+                <div class="space-y-4">
+                    <div id="choice1-1" class="interactive-choice p-4 border rounded-lg cursor-pointer flex items-center">
+                        <div class="w-10 h-10 bg-slate-200 rounded-lg flex items-center justify-center mr-4">📂</div>
+                        <div><h3 class="font-semibold">En "Mi Unidad"</h3><p class="text-sm text-slate-500">Lo guardo en mi espacio y luego lo comparto.</p></div>
+                    </div>
+                    <div id="choice1-2" class="interactive-choice p-4 border rounded-lg cursor-pointer flex items-center">
+                        <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center mr-4">🗂️</div>
+                        <div><h3 class="font-semibold">En la "Unidad Compartida" del equipo de Finanzas</h3><p class="text-sm text-slate-500">Es un archivo del equipo y debe vivir ahí.</p></div>
+                    </div>
+                </div>
+                <div id="feedback1" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
+            </div>
+            <div class="slide" data-path="member">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Mover vs. Crear Atajo: Una Diferencia Clave</h2>
+                <p class="text-lg text-slate-600 mb-6">Entender esto es fundamental para no causar problemas.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                        <h3 class="font-bold text-red-800 mb-2">Mover (Drag & Drop)</h3>
+                        <p class="text-sm text-red-700">Si mueves un archivo de una Unidad Compartida a "Mi Unidad", <strong class="font-semibold">le quitas el acceso a todo el equipo</strong>. El archivo ahora te pertenece solo a ti. ¡Nunca hagas esto!</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h3 class="font-bold text-green-800 mb-2">Crear un Atajo (Shift + Z)</h3>
+                        <p class="text-sm text-green-700">Crea un enlace al archivo original. Puedes poner el atajo en "Mi Unidad" para un acceso rápido, pero el archivo <strong class="font-semibold">sigue viviendo en la Unidad Compartida</strong> y todos conservan su acceso.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide" data-path="member">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">¡Ponte a Prueba! #2</h2>
+                <p class="text-lg text-slate-600 mb-8">Quieres acceder rápidamente a la "Guía de Estilo de Marca" desde tu "Mi Unidad", pero el archivo original está en la Unidad Compartida de Marketing. ¿Qué haces?</p>
+                <div class="space-y-4">
+                    <div id="choice2-1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Arrastro el archivo a "Mi Unidad".</h3></div>
+                    <div id="choice2-2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Selecciono el archivo y presiono `Shift + Z` para crear un atajo en "Mi Unidad".</h3></div>
+                </div>
+                <div id="feedback2" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
+            </div>
+            <div class="slide" data-path="member">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Búsqueda de Profesional</h2>
+                <p class="text-lg text-slate-600 mb-6">No pierdas tiempo buscando. Usa los filtros de búsqueda.</p>
+                <div class="p-4 bg-slate-50 rounded-lg border">
+                    <p class="text-slate-700 mb-4">Haz clic en el icono de filtros a la derecha de la barra de búsqueda para abrir la búsqueda avanzada. Puedes filtrar por:</p>
+                    <ul class="grid grid-cols-2 gap-x-4 gap-y-2 text-slate-600 text-sm">
+                        <li><strong>Tipo de archivo:</strong> Documentos, PDF, Hojas de cálculo...</li>
+                        <li><strong>Propietario:</strong> Para encontrar archivos de un compañero.</li>
+                        <li><strong>Ubicación:</strong> Busca solo en una Unidad Compartida específica.</li>
+                        <li><strong>Fecha de modificación:</strong> Hoy, últimos 7 días, etc.</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="slide" data-path="member">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Colaboración: La Forma Correcta</h2>
+                <p class="text-lg text-slate-600 mb-6">Olvídate de "Versión 2", "Versión Final", "Versión Final_AhoraSi".</p>
+                <div class="p-4 bg-slate-50 rounded-lg border">
+                    <h3 class="font-bold text-slate-800 mb-2">Trabajamos sobre un ÚNICO documento</h3>
+                    <p class="text-slate-600 mb-4">Google guarda un historial de todos los cambios. Si necesitamos recuperar algo, podemos acceder al **Historial de Versiones** desde `Archivo > Historial de versiones`.</p>
+                </div>
+            </div>
+            <div class="slide" data-path="member">
+                 <h2 class="text-3xl font-bold text-slate-800 mb-6">Las 3 Reglas de Oro (Resumen Final)</h2>
+                <ol class="space-y-6 text-lg">
+                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">1</span><div><h3 class="font-bold text-slate-800">El trabajo del equipo vive en las Unidades Compartidas.</h3></div></li>
+                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">2</span><div><h3 class="font-bold text-slate-800">Usa Atajos, no Muevas.</h3><p class="text-sm text-slate-600">Para acceder rápido a un archivo, crea un atajo. Nunca muevas un archivo de una Unidad Compartida.</p></div></li>
+                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">3</span><div><h3 class="font-bold text-slate-800">Edita, no dupliques.</h3></div></li>
+                </ol>
+            </div>
+
+
+            <!-- LEADER PATH SLIDES -->
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">El Costo del Desorden Digital</h2>
+                <p class="text-lg text-slate-600 mb-6">Como líder, seguro has enfrentado estos problemas:</p>
+                <ul class="space-y-4">
+                    <li class="p-4 bg-red-50 rounded-lg flex items-center"><span class="text-2xl mr-4">❓</span><div><strong class="text-red-800">Pérdida de Información:</strong> Un empleado se va y sus archivos críticos se van con él.</div></li>
+                    <li class="p-4 bg-red-50 rounded-lg flex items-center"><span class="text-2xl mr-4">🤯</span><div><strong class="text-red-800">Caos de Versiones:</strong> Múltiples copias del mismo archivo.</div></li>
+                </ul>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Unidades Compartidas: Tu Solución Estratégica</h2>
+                <p class="text-lg text-slate-600 mb-6">La <strong class="text-blue-600">información es un activo de la empresa, no del empleado.</strong></p>
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Continuidad del Negocio</h3></div>
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Control de Acceso</h3></div>
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Eficiencia y Orden</h3></div>
+                </div>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Gestionando a tu Equipo: Los Permisos</h2>
+                <div class="space-y-3">
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-800">Administrador:</strong> (Tú y tu segundo al mando). Control total.</div>
+                    <div class="p-3 bg-green-50 border border-green-200 rounded-lg"><strong class="text-green-800">Gestor de contenido:</strong> Miembros de confianza que pueden añadir, editar, mover y eliminar.</div>
+                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg"><strong class="text-yellow-800">Colaborador:</strong> El rol estándar. Pueden añadir y editar. Seguro y productivo.</div>
+                    <div class="p-3 bg-slate-50 border rounded-lg"><strong class="text-slate-800">Comentarista / Lector:</strong> Para stakeholders o externos que solo necesitan revisar.</div>
+                </div>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Configuraciones de Seguridad Avanzadas</h2>
+                <p class="text-lg text-slate-600 mb-6">Como Administrador, puedes añadir capas extra de seguridad:</p>
+                <ul class="space-y-4">
+                    <li class="p-3 bg-slate-50 rounded-lg"><strong class="text-blue-600">Evitar que los Colaboradores compartan:</strong> Puedes restringir que solo los Gestores de Contenido y Administradores puedan compartir archivos.</li>
+                    <li class="p-3 bg-slate-50 rounded-lg"><strong class="text-blue-600">Desactivar descarga, copia e impresión:</strong> Para información muy sensible, puedes impedir que los Lectores y Comentaristas descarguen, copien o impriman archivos.</li>
+                </ul>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Escenario de Liderazgo #1</h2>
+                <p class="text-lg text-slate-600 mb-8">Un consultor externo necesita ver documentos y dejar comentarios, pero no debe poder editar. ¿Qué rol le asignas?</p>
+                <div class="space-y-4">
+                    <div id="choice_leader_1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Colaborador</h3></div>
+                    <div id="choice_leader_2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Comentarista</h3></div>
+                </div>
+                <div id="feedback_leader_1" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Migrando Contenido Existente</h2>
+                <p class="text-lg text-slate-600 mb-6">¿Tu equipo ya tiene carpetas en sus "Mi Unidad"? Como líder, puedes moverlas a la Unidad Compartida.</p>
+                <div class="p-4 bg-slate-50 rounded-lg border">
+                    <p class="text-slate-700">Solo los usuarios con permiso de **Administrador** pueden mover carpetas desde "Mi Unidad" a una Unidad Compartida. Al hacerlo, la propiedad de todos los archivos se transfiere al equipo. Es la mejor forma de centralizar la información existente.</p>
+                </div>
+            </div>
+            <div class="slide" data-path="leader">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">Escenario de Liderazgo #2</h2>
+                <p class="text-lg text-slate-600 mb-8">Un miembro de tu equipo está creando un borrador de un plan estratégico muy sensible en su "Mi Unidad". ¿Cuál es la mejor acción?</p>
+                <div class="space-y-4">
+                    <div id="choice_leader_2_1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Pedirle que lo mueva a la Unidad Compartida de inmediato para asegurarlo.</h3></div>
+                    <div id="choice_leader_2_2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Recordarle que lo mueva a la Unidad Compartida cuando el borrador esté más avanzado.</h3></div>
+                </div>
+                <div id="feedback_leader_2" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
+            </div>
+            <div class="slide" data-path="leader">
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                     <div class="bg-amber-500 text-white p-4 rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 001.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800">Tu Compromiso como Líder</h2>
+                    <p class="mt-4 text-slate-600 text-lg max-w-lg">La adopción de esta herramienta depende de ti. Construyes una cultura de colaboración, transparencia y seguridad.</p>
+                    <p class="mt-8 text-2xl font-semibold text-amber-700">¡Lidera el cambio!</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Navigation -->
+        <div id="navigation-bar" class="bg-slate-100 p-4 border-t border-slate-200 flex items-center justify-between">
+            <button id="homeBtn" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg shadow-sm hover:bg-slate-50">Inicio</button>
+            <div id="slide-indicator" class="text-sm text-slate-500"></div>
+            <div>
+                <button id="prevBtn" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+                <button id="nextBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">Siguiente</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const allSlides = Array.from(document.querySelectorAll('.slide'));
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const homeBtn = document.getElementById('homeBtn');
+            const slideIndicator = document.getElementById('slide-indicator');
+            const navigationBar = document.getElementById('navigation-bar');
+            
+            let currentPath = '';
+            let pathSlides = [];
+            let currentSlideIndex = 0;
+
+            function showSlide(index) {
+                allSlides.forEach(slide => slide.classList.remove('active'));
+                pathSlides[index].classList.add('active');
+                
+                slideIndicator.textContent = `Paso ${index + 1} de ${pathSlides.length}`;
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === pathSlides.length - 1;
+            }
+            
+            function startPath(pathName) {
+                currentPath = pathName;
+                pathSlides = allSlides.filter(slide => slide.dataset.path === pathName);
+                currentSlideIndex = 0;
+                navigationBar.style.display = 'flex';
+                showSlide(currentSlideIndex);
+            }
+
+            document.getElementById('path-member').addEventListener('click', () => startPath('member'));
+            document.getElementById('path-leader').addEventListener('click', () => startPath('leader'));
+
+            homeBtn.addEventListener('click', () => {
+                navigationBar.style.display = 'none';
+                currentPath = '';
+                pathSlides = [];
+                allSlides.forEach(slide => slide.classList.remove('active'));
+                document.querySelector('.slide[data-path="home"]').classList.add('active');
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    showSlide(currentSlideIndex);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlideIndex < pathSlides.length - 1) {
+                    currentSlideIndex++;
+                    showSlide(currentSlideIndex);
+                }
+            });
+            
+            // Quiz Logic
+            const choice1_1 = document.getElementById('choice1-1');
+            const choice1_2 = document.getElementById('choice1-2');
+            const feedback1 = document.getElementById('feedback1');
+            choice1_1.addEventListener('click', () => {
+                feedback1.textContent = 'Incorrecto. Los archivos críticos del equipo siempre van en Unidades Compartidas.';
+                feedback1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
+            });
+            choice1_2.addEventListener('click', () => {
+                feedback1.textContent = '¡Correcto! Los archivos que pertenecen al equipo deben vivir en la Unidad Compartida.';
+                feedback1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
+            });
+
+            const choice2_1 = document.getElementById('choice2-1');
+            const choice2_2 = document.getElementById('choice2-2');
+            const feedback2 = document.getElementById('feedback2');
+            choice2_1.addEventListener('click', () => {
+                feedback2.textContent = 'Incorrecto. Mover el archivo le quita el acceso a todo el equipo.';
+                feedback2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
+            });
+            choice2_2.addEventListener('click', () => {
+                feedback2.textContent = '¡Correcto! El atajo te da acceso rápido sin afectar al equipo.';
+                feedback2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
+            });
+
+            const choice_leader_1 = document.getElementById('choice_leader_1');
+            const choice_leader_2 = document.getElementById('choice_leader_2');
+            const feedback_leader_1 = document.getElementById('feedback_leader_1');
+            choice_leader_1.addEventListener('click', () => {
+                feedback_leader_1.textContent = 'Incorrecto. El rol de Colaborador le permitiría editar archivos.';
+                feedback_leader_1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
+            });
+            choice_leader_2.addEventListener('click', () => {
+                feedback_leader_1.textContent = '¡Correcto! El rol de Comentarista es el ideal para este caso.';
+                feedback_leader_1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
+            });
+
+            const choice_leader_2_1 = document.getElementById('choice_leader_2_1');
+            const choice_leader_2_2 = document.getElementById('choice_leader_2_2');
+            const feedback_leader_2 = document.getElementById('feedback_leader_2');
+            choice_leader_2_1.addEventListener('click', () => {
+                feedback_leader_2.textContent = 'Incorrecto. Un borrador puede permanecer en "Mi Unidad". Forzar el movimiento puede interrumpir el flujo de trabajo.';
+                feedback_leader_2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
+            });
+            choice_leader_2_2.addEventListener('click', () => {
+                feedback_leader_2.textContent = '¡Correcto! Es la mejor acción. Respeta el espacio del borrador pero asegura que la versión final se mueva al lugar correcto.';
+                feedback_leader_2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
+            });
+        });
+    </script>
+
+</body>
+</html>
