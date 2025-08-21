@@ -3,353 +3,705 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía Maestra de Google Workspace</title>
+    <title>Marcador Torneo de Ping Pong - Andromeda vs. Nestlé</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background-image: linear-gradient(rgba(15, 41, 59, 0.95), rgba(13, 79, 78, 0.95)), url('https://raw.githubusercontent.com/Jjordaz22964692/Ping-Pong/main/imagenes/photo-1511067007398-7e4b90cfa4bc.avif');
+            background-color: #0f293b;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #F9FAFB;
         }
-        .slide {
-            display: none;
-            animation: fadeIn 0.5s;
+        h1, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
         }
-        .slide.active {
-            display: block;
+        .bracket-container {
+            position: relative;
+            display: flex;
+            justify-content: flex-start; 
+            padding: 2rem;
+            overflow-x: auto;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .bracket {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
         }
-        .slide-content::-webkit-scrollbar { width: 8px; }
-        .slide-content::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .slide-content::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        .slide-content::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        .interactive-choice, .path-choice {
-            transition: all 0.2s ease-in-out;
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            flex-grow: 0; /* Changed for symmetry */
+            flex-shrink: 0; /* Changed for symmetry */
+            width: 300px; /* Changed for symmetry */
+            padding: 0 2rem;
         }
-        .interactive-choice:hover, .path-choice:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .round-final { 
+            width: 350px; /* Changed for symmetry */
         }
-        #navigation-bar {
-            display: none;
+        .match {
+            background-color: rgba(31, 41, 55, 0.85);
+            border-radius: 0.75rem;
+            margin: 2.5rem 0;
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            width: 100%;
+        }
+        .match-completed { border-color: #4b5563; }
+        .match.is-focus-mode {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1.5);
+            z-index: 100; border-color: #f59e0b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            cursor: default; width: 90%; max-width: 400px;
+        }
+        .player {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 0; border-bottom: 1px solid #4b5563;
+        }
+        .player:last-child { border-bottom: none; }
+        .player-name {
+            font-weight: 500; flex-grow: 1; font-size: 1rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        .player-name:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .player-name[contenteditable="true"] {
+            background-color: #4b5563;
+            outline: 2px solid #f59e0b;
+            cursor: text;
+        }
+        .winner-highlight { animation: glow 1.5s ease-in-out infinite alternate; }
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #10b981, 0 0 20px #10b981; }
+            to { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #10b981, 0 0 40px #10b981; }
+        }
+        .player-score {
+            font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700;
+            margin-left: 1rem; width: 40px; text-align: center; color: #f59e0b;
+        }
+        .score-controls button {
+            background-color: #4b5563; border: none; color: white; border-radius: 9999px;
+            width: 32px; height: 32px; font-size: 1.2rem; line-height: 1;
+            margin-left: 0.5rem; cursor: pointer; transition: all 0.2s ease;
+        }
+        .score-controls button:hover:not(:disabled) { background-color: #6b7280; transform: scale(1.1); }
+        .winner-button {
+            background: linear-gradient(to right, #10b981, #14b8a6); color: white; border: none;
+            padding: 0.75rem 1rem; border-radius: 0.375rem; margin-top: 1rem; cursor: pointer;
+            width: 100%; font-weight: 700; font-size: 1rem; text-transform: uppercase;
+            transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .winner-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 10px rgba(0,0,0,0.2); }
+        .winner-button:disabled { background: #4b5563; cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
+        .logo-container {
+            display: flex; justify-content: center; align-items: center;
+            gap: 2.5rem; margin-bottom: 1rem;
+        }
+        .logo-container img {
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+        /* MODIFIED: Header Logo Sizes */
+        #nestle-logo-header { height: 100px; }
+        #andromeda-logo-header { height: 150px; }
+
+        .vs { font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 900; color: #d1d5db; text-shadow: 3px 3px 5px rgba(0,0,0,0.5); }
+        #backdrop {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.7); z-index: 50; opacity: 0;
+            transition: opacity 0.4s ease; pointer-events: none;
+        }
+        #backdrop.active { opacity: 1; pointer-events: auto; }
+        #fireworks-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 200; pointer-events: none;
+        }
+        #connector-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .connector-path.winner-path {
+            stroke: #10b981;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 5px #10b981);
+            transition: all 0.5s ease-in-out;
+        }
+        
+        /* MODIFIED: Watermark Styles */
+        .watermark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10vw;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.1; /* Increased Opacity */
+        }
+        .watermark-container img {
+            object-fit: contain;
+            max-width: 50vw;
+        }
+        #andromeda-watermark { height: 75vh; } /* Increased Size */
+        #nestle-watermark { height: 50vh; } /* Increased Size */
+
+        /* NEW: Champion Announcement Styles */
+        #champion-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+            cursor: pointer;
+        }
+        #champion-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .champion-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: #d1d5db;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+        .champion-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 10vw, 8rem);
+            font-weight: 900;
+            text-align: center;
+            padding: 0 2rem;
+            color: #fff;
+            animation: champion-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes champion-glow {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #f59e0b, 0 0 40px #f59e0b, 0 0 50px #f59e0b, 0 0 60px #f59e0b, 0 0 70px #f59e0b; }
+            to { text-shadow: 0 0 20px #fff, 0 0 30px #ffc700, 0 0 40px #ffc700, 0 0 50px #ffc700, 0 0 60px #ffc700, 0 0 70px #ffc700, 0 0 80px #ffc700; }
+        }
+
+        /* 2K Screen Optimizations */
+        @media (min-width: 2560px) {
+            .round { width: 380px; padding: 0 3rem; }
+            .round-final { width: 450px; }
+            .match { margin: 3.5rem 0; }
+            h1 { font-size: 5rem; }
+            .player-name { font-size: 1.2rem; }
+            .player-score { font-size: 2rem; }
+            #nestle-logo-header { height: 125px; }
+            #andromeda-logo-header { height: 187.5px; }
         }
     </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+<body class="p-4 sm:p-8">
 
-    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="height: 650px;">
-        
-        <!-- Slides Container -->
-        <div id="slides-container" class="flex-grow p-6 sm:p-10 overflow-y-auto slide-content">
-            
-            <!-- Slide 0: Path Selection -->
-            <div class="slide active" data-path="home">
-                <div class="flex flex-col items-center justify-center h-full text-center">
-                    <div class="bg-blue-600 text-white p-4 rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a1 1 0 011-1h14a1 1 0 110 2H3a1 1 0 01-1-1z" /></svg>
-                    </div>
-                    <h1 class="text-4xl font-bold text-slate-800">Guía Maestra de Google Workspace</h1>
-                    <p class="mt-4 text-slate-600 text-lg">Para comenzar, por favor selecciona tu rol:</p>
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-md">
-                        <div id="path-member" class="path-choice p-6 border rounded-lg cursor-pointer text-center">
-                            <h2 class="text-xl font-bold text-slate-800">Nuevo Miembro del Equipo</h2>
-                            <p class="text-sm text-slate-500 mt-2">Aprende a usar nuestras herramientas de colaboración desde cero.</p>
-                        </div>
-                        <div id="path-leader" class="path-choice p-6 border rounded-lg cursor-pointer text-center">
-                            <h2 class="text-xl font-bold text-slate-800">Líder de Área</h2>
-                            <p class="text-sm text-slate-500 mt-2">Aprende a gestionar, organizar y liderar a tu equipo en Workspace.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <canvas id="fireworks-canvas"></canvas>
+    <div id="backdrop"></div>
 
-            <!-- MEMBER PATH SLIDES -->
-            <div class="slide" data-path="member">
-                 <h2 class="text-3xl font-bold text-slate-800 mb-6">El Panorama General: Dos Mundos Diferentes</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="p-6 bg-slate-50 rounded-lg border">
-                        <h3 class="text-2xl font-bold text-slate-700 mb-3">Mi Unidad</h3>
-                        <p class="mb-4 text-slate-600">Tu espacio de trabajo **personal**.</p>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span><span>Borradores y documentos personales.</span></li>
-                            <li class="flex items-start"><span class="text-blue-500 mr-2">✓</span><span>Archivos que solo tú necesitas.</span></li>
-                            <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong class="font-semibold">NO</strong> es para archivos críticos del equipo.</span></li>
-                        </ul>
-                    </div>
-                    <div class="p-6 bg-blue-50 rounded-lg border border-blue-300">
-                        <h3 class="text-2xl font-bold text-blue-800 mb-3">Unidades Compartidas</h3>
-                        <p class="mb-4 text-blue-700">La biblioteca y cerebro **del equipo**.</p>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Documentos de proyectos y departamentos.</span></li>
-                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Información que debe perdurar.</span></li>
-                            <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span>Nuestra fuente única de verdad.</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="slide" data-path="member">
-                 <h2 class="text-3xl font-bold text-slate-800 mb-4">¡Ponte a Prueba! #1</h2>
-                <p class="text-lg text-slate-600 mb-8">Estás trabajando en el reporte financiero trimestral que todo el departamento necesita. ¿Dónde lo guardas?</p>
-                <div class="space-y-4">
-                    <div id="choice1-1" class="interactive-choice p-4 border rounded-lg cursor-pointer flex items-center">
-                        <div class="w-10 h-10 bg-slate-200 rounded-lg flex items-center justify-center mr-4">📂</div>
-                        <div><h3 class="font-semibold">En "Mi Unidad"</h3><p class="text-sm text-slate-500">Lo guardo en mi espacio y luego lo comparto.</p></div>
-                    </div>
-                    <div id="choice1-2" class="interactive-choice p-4 border rounded-lg cursor-pointer flex items-center">
-                        <div class="w-10 h-10 bg-blue-200 rounded-lg flex items-center justify-center mr-4">🗂️</div>
-                        <div><h3 class="font-semibold">En la "Unidad Compartida" del equipo de Finanzas</h3><p class="text-sm text-slate-500">Es un archivo del equipo y debe vivir ahí.</p></div>
-                    </div>
-                </div>
-                <div id="feedback1" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
-            </div>
-            <div class="slide" data-path="member">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Mover vs. Crear Atajo: Una Diferencia Clave</h2>
-                <p class="text-lg text-slate-600 mb-6">Entender esto es fundamental para no causar problemas.</p>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
-                        <h3 class="font-bold text-red-800 mb-2">Mover (Drag & Drop)</h3>
-                        <p class="text-sm text-red-700">Si mueves un archivo de una Unidad Compartida a "Mi Unidad", <strong class="font-semibold">le quitas el acceso a todo el equipo</strong>. El archivo ahora te pertenece solo a ti. ¡Nunca hagas esto!</p>
-                    </div>
-                    <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <h3 class="font-bold text-green-800 mb-2">Crear un Atajo (Shift + Z)</h3>
-                        <p class="text-sm text-green-700">Crea un enlace al archivo original. Puedes poner el atajo en "Mi Unidad" para un acceso rápido, pero el archivo <strong class="font-semibold">sigue viviendo en la Unidad Compartida</strong> y todos conservan su acceso.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="slide" data-path="member">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4">¡Ponte a Prueba! #2</h2>
-                <p class="text-lg text-slate-600 mb-8">Quieres acceder rápidamente a la "Guía de Estilo de Marca" desde tu "Mi Unidad", pero el archivo original está en la Unidad Compartida de Marketing. ¿Qué haces?</p>
-                <div class="space-y-4">
-                    <div id="choice2-1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Arrastro el archivo a "Mi Unidad".</h3></div>
-                    <div id="choice2-2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Selecciono el archivo y presiono `Shift + Z` para crear un atajo en "Mi Unidad".</h3></div>
-                </div>
-                <div id="feedback2" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
-            </div>
-            <div class="slide" data-path="member">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Búsqueda de Profesional</h2>
-                <p class="text-lg text-slate-600 mb-6">No pierdas tiempo buscando. Usa los filtros de búsqueda.</p>
-                <div class="p-4 bg-slate-50 rounded-lg border">
-                    <p class="text-slate-700 mb-4">Haz clic en el icono de filtros a la derecha de la barra de búsqueda para abrir la búsqueda avanzada. Puedes filtrar por:</p>
-                    <ul class="grid grid-cols-2 gap-x-4 gap-y-2 text-slate-600 text-sm">
-                        <li><strong>Tipo de archivo:</strong> Documentos, PDF, Hojas de cálculo...</li>
-                        <li><strong>Propietario:</strong> Para encontrar archivos de un compañero.</li>
-                        <li><strong>Ubicación:</strong> Busca solo en una Unidad Compartida específica.</li>
-                        <li><strong>Fecha de modificación:</strong> Hoy, últimos 7 días, etc.</li>
-                    </ul>
-                </div>
-            </div>
-             <div class="slide" data-path="member">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Colaboración: La Forma Correcta</h2>
-                <p class="text-lg text-slate-600 mb-6">Olvídate de "Versión 2", "Versión Final", "Versión Final_AhoraSi".</p>
-                <div class="p-4 bg-slate-50 rounded-lg border">
-                    <h3 class="font-bold text-slate-800 mb-2">Trabajamos sobre un ÚNICO documento</h3>
-                    <p class="text-slate-600 mb-4">Google guarda un historial de todos los cambios. Si necesitamos recuperar algo, podemos acceder al **Historial de Versiones** desde `Archivo > Historial de versiones`.</p>
-                </div>
-            </div>
-            <div class="slide" data-path="member">
-                 <h2 class="text-3xl font-bold text-slate-800 mb-6">Las 3 Reglas de Oro (Resumen Final)</h2>
-                <ol class="space-y-6 text-lg">
-                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">1</span><div><h3 class="font-bold text-slate-800">El trabajo del equipo vive en las Unidades Compartidas.</h3></div></li>
-                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">2</span><div><h3 class="font-bold text-slate-800">Usa Atajos, no Muevas.</h3><p class="text-sm text-slate-600">Para acceder rápido a un archivo, crea un atajo. Nunca muevas un archivo de una Unidad Compartida.</p></div></li>
-                    <li class="flex items-start p-4 bg-amber-50 rounded-lg"><span class="text-3xl font-bold text-amber-500 mr-4">3</span><div><h3 class="font-bold text-slate-800">Edita, no dupliques.</h3></div></li>
-                </ol>
-            </div>
-
-
-            <!-- LEADER PATH SLIDES -->
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">El Costo del Desorden Digital</h2>
-                <p class="text-lg text-slate-600 mb-6">Como líder, seguro has enfrentado estos problemas:</p>
-                <ul class="space-y-4">
-                    <li class="p-4 bg-red-50 rounded-lg flex items-center"><span class="text-2xl mr-4">❓</span><div><strong class="text-red-800">Pérdida de Información:</strong> Un empleado se va y sus archivos críticos se van con él.</div></li>
-                    <li class="p-4 bg-red-50 rounded-lg flex items-center"><span class="text-2xl mr-4">🤯</span><div><strong class="text-red-800">Caos de Versiones:</strong> Múltiples copias del mismo archivo.</div></li>
-                </ul>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Unidades Compartidas: Tu Solución Estratégica</h2>
-                <p class="text-lg text-slate-600 mb-6">La <strong class="text-blue-600">información es un activo de la empresa, no del empleado.</strong></p>
-                <div class="grid md:grid-cols-2 gap-6 mt-6">
-                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Continuidad del Negocio</h3></div>
-                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Control de Acceso</h3></div>
-                    <div class="p-4 bg-green-50 rounded-lg border border-green-200"><h3 class="font-bold text-green-800">✅ Eficiencia y Orden</h3></div>
-                </div>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Gestionando a tu Equipo: Los Permisos</h2>
-                <div class="space-y-3">
-                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-800">Administrador:</strong> (Tú y tu segundo al mando). Control total.</div>
-                    <div class="p-3 bg-green-50 border border-green-200 rounded-lg"><strong class="text-green-800">Gestor de contenido:</strong> Miembros de confianza que pueden añadir, editar, mover y eliminar.</div>
-                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg"><strong class="text-yellow-800">Colaborador:</strong> El rol estándar. Pueden añadir y editar. Seguro y productivo.</div>
-                    <div class="p-3 bg-slate-50 border rounded-lg"><strong class="text-slate-800">Comentarista / Lector:</strong> Para stakeholders o externos que solo necesitan revisar.</div>
-                </div>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Configuraciones de Seguridad Avanzadas</h2>
-                <p class="text-lg text-slate-600 mb-6">Como Administrador, puedes añadir capas extra de seguridad:</p>
-                <ul class="space-y-4">
-                    <li class="p-3 bg-slate-50 rounded-lg"><strong class="text-blue-600">Evitar que los Colaboradores compartan:</strong> Puedes restringir que solo los Gestores de Contenido y Administradores puedan compartir archivos.</li>
-                    <li class="p-3 bg-slate-50 rounded-lg"><strong class="text-blue-600">Desactivar descarga, copia e impresión:</strong> Para información muy sensible, puedes impedir que los Lectores y Comentaristas descarguen, copien o impriman archivos.</li>
-                </ul>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4">Escenario de Liderazgo #1</h2>
-                <p class="text-lg text-slate-600 mb-8">Un consultor externo necesita ver documentos y dejar comentarios, pero no debe poder editar. ¿Qué rol le asignas?</p>
-                <div class="space-y-4">
-                    <div id="choice_leader_1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Colaborador</h3></div>
-                    <div id="choice_leader_2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Comentarista</h3></div>
-                </div>
-                <div id="feedback_leader_1" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-6">Migrando Contenido Existente</h2>
-                <p class="text-lg text-slate-600 mb-6">¿Tu equipo ya tiene carpetas en sus "Mi Unidad"? Como líder, puedes moverlas a la Unidad Compartida.</p>
-                <div class="p-4 bg-slate-50 rounded-lg border">
-                    <p class="text-slate-700">Solo los usuarios con permiso de **Administrador** pueden mover carpetas desde "Mi Unidad" a una Unidad Compartida. Al hacerlo, la propiedad de todos los archivos se transfiere al equipo. Es la mejor forma de centralizar la información existente.</p>
-                </div>
-            </div>
-            <div class="slide" data-path="leader">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4">Escenario de Liderazgo #2</h2>
-                <p class="text-lg text-slate-600 mb-8">Un miembro de tu equipo está creando un borrador de un plan estratégico muy sensible en su "Mi Unidad". ¿Cuál es la mejor acción?</p>
-                <div class="space-y-4">
-                    <div id="choice_leader_2_1" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Pedirle que lo mueva a la Unidad Compartida de inmediato para asegurarlo.</h3></div>
-                    <div id="choice_leader_2_2" class="interactive-choice p-4 border rounded-lg cursor-pointer"><h3 class="font-semibold">Recordarle que lo mueva a la Unidad Compartida cuando el borrador esté más avanzado.</h3></div>
-                </div>
-                <div id="feedback_leader_2" class="mt-6 p-4 rounded-lg text-center font-semibold hidden"></div>
-            </div>
-            <div class="slide" data-path="leader">
-                <div class="flex flex-col items-center justify-center h-full text-center">
-                     <div class="bg-amber-500 text-white p-4 rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 001.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
-                    </div>
-                    <h2 class="text-3xl font-bold text-slate-800">Tu Compromiso como Líder</h2>
-                    <p class="mt-4 text-slate-600 text-lg max-w-lg">La adopción de esta herramienta depende de ti. Construyes una cultura de colaboración, transparencia y seguridad.</p>
-                    <p class="mt-8 text-2xl font-semibold text-amber-700">¡Lidera el cambio!</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Navigation -->
-        <div id="navigation-bar" class="bg-slate-100 p-4 border-t border-slate-200 flex items-center justify-between">
-            <button id="homeBtn" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg shadow-sm hover:bg-slate-50">Inicio</button>
-            <div id="slide-indicator" class="text-sm text-slate-500"></div>
-            <div>
-                <button id="prevBtn" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg shadow-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
-                <button id="nextBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">Siguiente</button>
-            </div>
-        </div>
-
+    <!-- NEW: Watermarks -->
+    <div class="watermark-container">
+        <img id="andromeda-watermark" src="https://raw.githubusercontent.com/Jjordaz22964692/Ping-Pong/main/imagenes/Logo%20andromeda%20ventures-01.png" alt="Andromeda Ventures Watermark">
+        <img id="nestle-watermark" src="https://raw.githubusercontent.com/Jjordaz22964692/Ping-Pong/main/imagenes/pngwing.com.png" alt="Nestlé Watermark">
     </div>
 
+    <!-- NEW: Champion Screen -->
+    <div id="champion-overlay" onclick="this.classList.remove('visible')">
+        <p class="champion-title">¡CAMPEÓN!</p>
+        <h2 id="champion-name-display" class="champion-name"></h2>
+    </div>
+
+    <header class="text-center mb-8">
+        <div class="logo-container">
+             <img id="andromeda-logo-header" src="https://raw.githubusercontent.com/Jjordaz22964692/Ping-Pong/main/imagenes/Logo%20andromeda%20ventures-01.png" alt="Andromeda Ventures Logo" onerror="this.onerror=null;this.src='https://placehold.co/225x150/0f293b/FFFFFF?text=Andromeda';">
+             <span class="vs">VS</span>
+             <img id="nestle-logo-header" src="https://raw.githubusercontent.com/Jjordaz22964692/Ping-Pong/main/imagenes/pngwing.com.png" alt="Nestlé Logo" onerror="this.onerror=null;this.src='https://placehold.co/150x100/0f293b/FFFFFF?text=Nestlé';">
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mt-6">Torneo de Ping Pong</h1>
+    </header>
+
+    <div class="text-center mb-8 flex justify-center gap-4">
+        <button id="reset-tournament-btn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-5 rounded-lg shadow-lg transition-transform transform hover:scale-105">Reiniciar Torneo</button>
+        <button id="clear-data-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-lg transition-transform transform hover:scale-105">Borrar Datos Guardados</button>
+    </div>
+
+    <div class="bracket-container" id="bracket-container">
+        <svg id="connector-svg"></svg>
+        <div class="bracket" id="bracket">
+            <!-- The rest of the HTML for the bracket remains the same -->
+            <!-- Ronda 1 (Izquierda) -->
+            <div class="round">
+                <div class="match" data-match-id="1" data-next-match="9" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Alejandra G. - Ricardo P.</span><div class="score-controls"><button onclick="changeScore(1, 1, -1)">-</button><span class="player-score" id="score-1-1">0</span><button onclick="changeScore(1, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Justin J. - Kender P.</span><div class="score-controls"><button onclick="changeScore(1, 2, -1)">-</button><span class="player-score" id="score-1-2">0</span><button onclick="changeScore(1, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(1, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="2" data-next-match="9" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Cecilia B. - Valeria O.</span><div class="score-controls"><button onclick="changeScore(2, 1, -1)">-</button><span class="player-score" id="score-2-1">0</span><button onclick="changeScore(2, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Feliciano G. - Pedro C.</span><div class="score-controls"><button onclick="changeScore(2, 2, -1)">-</button><span class="player-score" id="score-2-2">0</span><button onclick="changeScore(2, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(2, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="3" data-next-match="10" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Gisanny M. - Mariam M.</span><div class="score-controls"><button onclick="changeScore(3, 1, -1)">-</button><span class="player-score" id="score-3-1">0</span><button onclick="changeScore(3, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Vanesa C. - Iván L.</span><div class="score-controls"><button onclick="changeScore(3, 2, -1)">-</button><span class="player-score" id="score-3-2">0</span><button onclick="changeScore(3, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(3, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="4" data-next-match="10" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Andrés D. - Vicente O.</span><div class="score-controls"><button onclick="changeScore(4, 1, -1)">-</button><span class="player-score" id="score-4-1">0</span><button onclick="changeScore(4, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Lui H. - Jesús G.</span><div class="score-controls"><button onclick="changeScore(4, 2, -1)">-</button><span class="player-score" id="score-4-2">0</span><button onclick="changeScore(4, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(4, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+            <!-- Cuartos de Final (Izquierda) -->
+            <div class="round">
+                <div class="match" data-match-id="9" data-next-match="13" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador M1</span><div class="score-controls"><button onclick="changeScore(9, 1, -1)">-</button><span class="player-score" id="score-9-1">0</span><button onclick="changeScore(9, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador M2</span><div class="score-controls"><button onclick="changeScore(9, 2, -1)">-</button><span class="player-score" id="score-9-2">0</span><button onclick="changeScore(9, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(9, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="10" data-next-match="13" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador M3</span><div class="score-controls"><button onclick="changeScore(10, 1, -1)">-</button><span class="player-score" id="score-10-1">0</span><button onclick="changeScore(10, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador M4</span><div class="score-controls"><button onclick="changeScore(10, 2, -1)">-</button><span class="player-score" id="score-10-2">0</span><button onclick="changeScore(10, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(10, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+            <!-- Semifinal (Izquierda) -->
+            <div class="round">
+                <div class="match" data-match-id="13" data-next-match="15" data-next-player-slot="1" data-loser-to="16" data-loser-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador QF1</span><div class="score-controls"><button onclick="changeScore(13, 1, -1)">-</button><span class="player-score" id="score-13-1">0</span><button onclick="changeScore(13, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador QF2</span><div class="score-controls"><button onclick="changeScore(13, 2, -1)">-</button><span class="player-score" id="score-13-2">0</span><button onclick="changeScore(13, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(13, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+            <!-- Final y 3er Lugar -->
+            <div class="round round-final">
+                <div class="match" data-match-id="15" onclick="focusMatch(event)">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-yellow-400 uppercase">Gran Final</h3>
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador SF1</span><div class="score-controls"><button onclick="changeScore(15, 1, -1)">-</button><span class="player-score" id="score-15-1">0</span><button onclick="changeScore(15, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador SF2</span><div class="score-controls"><button onclick="changeScore(15, 2, -1)">-</button><span class="player-score" id="score-15-2">0</span><button onclick="changeScore(15, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(15, event)" disabled>Declarar Campeón</button>
+                </div>
+                <div class="match" data-match-id="16" onclick="focusMatch(event)">
+                    <h3 class="text-xl font-bold text-center mb-2 text-orange-400 uppercase">Tercer Lugar</h3>
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Perdedor SF1</span><div class="score-controls"><button onclick="changeScore(16, 1, -1)">-</button><span class="player-score" id="score-16-1">0</span><button onclick="changeScore(16, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Perdedor SF2</span><div class="score-controls"><button onclick="changeScore(16, 2, -1)">-</button><span class="player-score" id="score-16-2">0</span><button onclick="changeScore(16, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(16, event)" disabled>Declarar 3er Lugar</button>
+                </div>
+            </div>
+            <!-- Semifinal (Derecha) -->
+            <div class="round">
+                <div class="match" data-match-id="14" data-next-match="15" data-next-player-slot="2" data-loser-to="16" data-loser-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador QF3</span><div class="score-controls"><button onclick="changeScore(14, 1, -1)">-</button><span class="player-score" id="score-14-1">0</span><button onclick="changeScore(14, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador QF4</span><div class="score-controls"><button onclick="changeScore(14, 2, -1)">-</button><span class="player-score" id="score-14-2">0</span><button onclick="changeScore(14, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(14, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+            <!-- Cuartos de Final (Derecha) -->
+            <div class="round">
+                <div class="match" data-match-id="11" data-next-match="14" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador M5</span><div class="score-controls"><button onclick="changeScore(11, 1, -1)">-</button><span class="player-score" id="score-11-1">0</span><button onclick="changeScore(11, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador M6</span><div class="score-controls"><button onclick="changeScore(11, 2, -1)">-</button><span class="player-score" id="score-11-2">0</span><button onclick="changeScore(11, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(11, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="12" data-next-match="14" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Ganador M7</span><div class="score-controls"><button onclick="changeScore(12, 1, -1)">-</button><span class="player-score" id="score-12-1">0</span><button onclick="changeScore(12, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ganador M8</span><div class="score-controls"><button onclick="changeScore(12, 2, -1)">-</button><span class="player-score" id="score-12-2">0</span><button onclick="changeScore(12, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(12, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+            <!-- Ronda 1 (Derecha) -->
+            <div class="round">
+                <div class="match" data-match-id="5" data-next-match="11" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Angel B. - Samuel D.</span><div class="score-controls"><button onclick="changeScore(5, 1, -1)">-</button><span class="player-score" id="score-5-1">0</span><button onclick="changeScore(5, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Alexis R. - Arturo B.</span><div class="score-controls"><button onclick="changeScore(5, 2, -1)">-</button><span class="player-score" id="score-5-2">0</span><button onclick="changeScore(5, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(5, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="6" data-next-match="11" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Verónica S. - Enrique J.</span><div class="score-controls"><button onclick="changeScore(6, 1, -1)">-</button><span class="player-score" id="score-6-1">0</span><button onclick="changeScore(6, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Ruben L. - Ricardo F.</span><div class="score-controls"><button onclick="changeScore(6, 2, -1)">-</button><span class="player-score" id="score-6-2">0</span><button onclick="changeScore(6, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(6, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="7" data-next-match="12" data-next-player-slot="1" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Katiuska R. - Miguel P.</span><div class="score-controls"><button onclick="changeScore(7, 1, -1)">-</button><span class="player-score" id="score-7-1">0</span><button onclick="changeScore(7, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Alejandro M. - Ricardo C.</span><div class="score-controls"><button onclick="changeScore(7, 2, -1)">-</button><span class="player-score" id="score-7-2">0</span><button onclick="changeScore(7, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(7, event)" disabled>Declarar Ganador</button>
+                </div>
+                <div class="match" data-match-id="8" data-next-match="12" data-next-player-slot="2" onclick="focusMatch(event)">
+                    <div class="player" data-player-index="1"><span class="player-name" ondblclick="editName(this)">Isabella R. - Anthony M.</span><div class="score-controls"><button onclick="changeScore(8, 1, -1)">-</button><span class="player-score" id="score-8-1">0</span><button onclick="changeScore(8, 1, 1)">+</button></div></div>
+                    <div class="player" data-player-index="2"><span class="player-name" ondblclick="editName(this)">Gabriel C. - José P.</span><div class="score-controls"><button onclick="changeScore(8, 2, -1)">-</button><span class="player-score" id="score-8-2">0</span><button onclick="changeScore(8, 2, 1)">+</button></div></div>
+                    <button class="winner-button" onclick="declareWinner(8, event)" disabled>Declarar Ganador</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const allSlides = Array.from(document.querySelectorAll('.slide'));
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const homeBtn = document.getElementById('homeBtn');
-            const slideIndicator = document.getElementById('slide-indicator');
-            const navigationBar = document.getElementById('navigation-bar');
-            
-            let currentPath = '';
-            let pathSlides = [];
-            let currentSlideIndex = 0;
+        const WINNING_SCORE = 11;
+        const STORAGE_KEY = 'pingPongTournamentState_v2';
+        const backdrop = document.getElementById('backdrop');
+        const synth = new Tone.Synth().toDestination();
+        let audioStarted = false;
 
-            function showSlide(index) {
-                allSlides.forEach(slide => slide.classList.remove('active'));
-                pathSlides[index].classList.add('active');
+        // --- NAME EDITING ---
+        function editName(element) {
+            element.setAttribute('contenteditable', 'true');
+            element.focus();
+            document.execCommand('selectAll', false, null);
+
+            element.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    element.blur();
+                }
+            };
+            element.onblur = () => {
+                element.setAttribute('contenteditable', 'false');
+                saveState();
+            };
+        }
+
+        // --- FOCUS MODE ---
+        function focusMatch(event) {
+            if (event.target.tagName === 'BUTTON' || event.target.closest('.score-controls') || event.target.isContentEditable) {
+                event.stopPropagation();
+                return;
+            }
+            const matchElement = event.currentTarget;
+            if (matchElement.classList.contains('is-focus-mode')) return;
+            unfocusAllMatches();
+            matchElement.classList.add('is-focus-mode');
+            backdrop.classList.add('active');
+        }
+
+        function unfocusAllMatches() {
+            document.querySelectorAll('.is-focus-mode').forEach(el => el.classList.remove('is-focus-mode'));
+            backdrop.classList.remove('active');
+        }
+        backdrop.addEventListener('click', unfocusAllMatches);
+
+        // --- SCORING LOGIC ---
+        async function changeScore(matchId, playerIndex, delta) {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+                console.log('Audio context started');
+            }
+
+            const scoreElement = document.getElementById(`score-${matchId}-${playerIndex}`);
+            let newScore = parseInt(scoreElement.textContent) + delta;
+            if (newScore >= 0) {
+                scoreElement.textContent = newScore;
+                if (delta > 0) {
+                    synth.triggerAttackRelease("G5", "32n");
+                }
+            }
+            checkWinnerCondition(matchId);
+            saveState();
+        }
+
+        function checkWinnerCondition(matchId) {
+            const matchElement = document.querySelector(`[data-match-id='${matchId}']`);
+            if (matchElement.classList.contains('match-completed')) return;
+
+            const scores = Array.from(matchElement.querySelectorAll('.player-score')).map(s => parseInt(s.textContent));
+            const winnerButton = matchElement.querySelector('.winner-button');
+            const [p1Score, p2Score] = scores;
+            
+            const hasWinner = (p1Score >= WINNING_SCORE && p1Score >= p2Score + 2) || (p2Score >= WINNING_SCORE && p2Score >= p1Score + 2);
+            winnerButton.disabled = !hasWinner;
+        }
+
+        // --- WINNER DECLARATION ---
+        function declareWinner(matchId, event) {
+            event.stopPropagation();
+            const matchElement = document.querySelector(`[data-match-id='${matchId}']`);
+            if (matchElement.classList.contains('match-completed')) return;
+
+            const players = matchElement.querySelectorAll('.player');
+            const scores = Array.from(players).map(p => parseInt(p.querySelector('.player-score').textContent));
+            
+            const winnerIndex = scores[0] > scores[1] ? 0 : 1;
+            const winner = players[winnerIndex];
+            const loser = players[1 - winnerIndex];
+            const winnerNameEl = winner.querySelector('.player-name');
+
+            winner.classList.add('bg-green-600/30', 'font-bold');
+            winnerNameEl.classList.add('winner-highlight');
+            loser.classList.add('bg-red-600/30', 'opacity-60');
+            matchElement.classList.add('match-completed');
+            
+            matchElement.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            matchElement.querySelector('.winner-button').textContent = "Finalizado";
+
+            const isFinal = matchElement.dataset.matchId === '15';
+            const rect = winnerNameEl.getBoundingClientRect();
+            launchFireworks(rect.left + rect.width / 2, rect.top + rect.height / 2, isFinal);
+
+            if (isFinal) {
+                document.getElementById('champion-name-display').textContent = winnerNameEl.textContent;
+                setTimeout(() => {
+                    document.getElementById('champion-overlay').classList.add('visible');
+                }, 1000);
+            }
+
+            const { nextMatch, nextPlayerSlot, loserTo, loserSlot } = matchElement.dataset;
+
+            if (nextMatch && nextPlayerSlot) {
+                const nextPlayerElement = document.querySelector(`[data-match-id='${nextMatch}'] [data-player-index='${nextPlayerSlot}'] .player-name`);
+                if (nextPlayerElement) nextPlayerElement.textContent = winnerNameEl.textContent;
+            }
+            
+            if (loserTo && loserSlot) {
+                const thirdPlaceSlot = document.querySelector(`[data-match-id='${loserTo}'] [data-player-index='${loserSlot}'] .player-name`);
+                if (thirdPlaceSlot) thirdPlaceSlot.textContent = loser.querySelector('.player-name').textContent;
+            }
+            
+            setTimeout(() => {
+                drawConnectors();
+                saveState();
+            }, 300);
+        }
+
+        // --- DATA PERSISTENCE ---
+        function saveState() {
+            const state = {
+                matches: {}
+            };
+            document.querySelectorAll('.match').forEach(match => {
+                const matchId = match.dataset.matchId;
+                const players = [];
+                match.querySelectorAll('.player').forEach(player => {
+                    players.push({
+                        name: player.querySelector('.player-name').textContent,
+                        score: player.querySelector('.player-score').textContent
+                    });
+                });
+                state.matches[matchId] = {
+                    players: players,
+                    isCompleted: match.classList.contains('match-completed')
+                };
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem(STORAGE_KEY);
+            if (!savedState) return;
+            const state = JSON.parse(savedState);
+
+            for (const matchId in state.matches) {
+                const matchData = state.matches[matchId];
+                const matchElement = document.querySelector(`[data-match-id='${matchId}']`);
+                if (matchElement) {
+                    const playerElements = matchElement.querySelectorAll('.player');
+                    matchData.players.forEach((playerData, index) => {
+                        if (playerElements[index]) {
+                            playerElements[index].querySelector('.player-name').textContent = playerData.name;
+                            playerElements[index].querySelector('.player-score').textContent = playerData.score;
+                        }
+                    });
+
+                    if (matchData.isCompleted) {
+                        const scores = matchData.players.map(p => parseInt(p.score));
+                        const winnerIndex = scores[0] > scores[1] ? 0 : 1;
+                        playerElements[winnerIndex].classList.add('bg-green-600/30', 'font-bold');
+                        playerElements[winnerIndex].querySelector('.player-name').classList.add('winner-highlight');
+                        playerElements[1 - winnerIndex].classList.add('bg-red-600/30', 'opacity-60');
+                        matchElement.classList.add('match-completed');
+                        matchElement.querySelectorAll('button').forEach(btn => btn.disabled = true);
+                        matchElement.querySelector('.winner-button').textContent = "Finalizado";
+                    }
+                    checkWinnerCondition(matchId);
+                }
+            }
+        }
+
+        // --- TOURNAMENT CONTROLS ---
+        const placeholderNames = {
+            '9': ['Ganador M1', 'Ganador M2'], '10': ['Ganador M3', 'Ganador M4'],
+            '11': ['Ganador M5', 'Ganador M6'], '12': ['Ganador M7', 'Ganador M8'],
+            '13': ['Ganador QF1', 'Ganador QF2'], '14': ['Ganador QF3', 'Ganador QF4'],
+            '15': ['Ganador SF1', 'Ganador SF2'], '16': ['Perdedor SF1', 'Perdedor SF2'],
+        };
+
+        document.getElementById('reset-tournament-btn').addEventListener('click', () => {
+             if (confirm('¿Estás seguro de que quieres reiniciar el torneo? Se reiniciarán todos los puntajes y el progreso, pero se conservarán los nombres de la primera ronda.')) {
+                const currentState = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (!currentState) {
+                    location.reload();
+                    return;
+                }
+
+                for (const matchId in currentState.matches) {
+                    const matchData = currentState.matches[matchId];
+                    matchData.players.forEach(p => p.score = '0');
+                    matchData.isCompleted = false;
+                    
+                    if (placeholderNames[matchId]) {
+                        matchData.players[0].name = placeholderNames[matchId][0];
+                        matchData.players[1].name = placeholderNames[matchId][1];
+                    }
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentState));
+                location.reload();
+            }
+        });
+
+        document.getElementById('clear-data-btn').addEventListener('click', () => {
+             if (confirm('¿Estás seguro de que quieres borrar TODOS los datos guardados? Esto incluye los nombres de los jugadores editados.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        });
+
+        // --- FIREWORKS ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrameId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        class Particle {
+            constructor(x, y, color, isBig) {
+                this.x = x; this.y = y; this.color = color; this.isBig = isBig; // FIX: Store isBig property
+                this.size = Math.random() * (this.isBig ? 3 : 2) + 1; this.alpha = 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * (this.isBig ? 8 : 5) + 1; this.gravity = 0.1;
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                this.vy += this.gravity;
+                this.alpha -= this.isBig ? 0.015 : 0.02; // FIX: Use this.isBig
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        function createExplosion(x, y, isBig) {
+            const particleCount = isBig ? 300 : 100;
+            const colors = ['#FFC700', '#f59e0b', '#FFFFFF', '#10b981'];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)], isBig));
+            }
+        }
+        
+        function animateFireworks() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].draw(); particles[i].update();
+                if (particles[i].alpha <= 0) particles.splice(i, 1);
+            }
+            animationFrameId = requestAnimationFrame(animateFireworks);
+            if (particles.length === 0) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function launchFireworks(x, y, isBig = false) {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            particles = [];
+            createExplosion(x, y, isBig);
+            animateFireworks();
+        }
+
+        // --- SVG CONNECTORS ---
+        const svg = document.getElementById('connector-svg');
+        const bracketContainer = document.getElementById('bracket-container');
+        const bracket = document.getElementById('bracket');
+
+        function drawConnectors() {
+            svg.innerHTML = ''; 
+            const containerRect = bracketContainer.getBoundingClientRect();
+
+            document.querySelectorAll('.match[data-next-match]').forEach(match => {
+                const nextMatchId = match.dataset.nextMatch;
+                const nextMatch = document.querySelector(`.match[data-match-id='${nextMatchId}']`);
+                if (!nextMatch) return;
+
+                const startRect = match.getBoundingClientRect();
+                const endRect = nextMatch.getBoundingClientRect();
+
+                const startX = startRect.right - containerRect.left + bracketContainer.scrollLeft;
+                const startY = startRect.top + startRect.height / 2 - containerRect.top;
                 
-                slideIndicator.textContent = `Paso ${index + 1} de ${pathSlides.length}`;
-                prevBtn.disabled = index === 0;
-                nextBtn.disabled = index === pathSlides.length - 1;
-            }
-            
-            function startPath(pathName) {
-                currentPath = pathName;
-                pathSlides = allSlides.filter(slide => slide.dataset.path === pathName);
-                currentSlideIndex = 0;
-                navigationBar.style.display = 'flex';
-                showSlide(currentSlideIndex);
-            }
+                const endX = endRect.left - containerRect.left + bracketContainer.scrollLeft;
+                const endY = endRect.top + endRect.height / 2 - containerRect.top;
 
-            document.getElementById('path-member').addEventListener('click', () => startPath('member'));
-            document.getElementById('path-leader').addEventListener('click', () => startPath('leader'));
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midX = startX + 40;
+                const d = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+                
+                path.setAttribute('d', d);
+                path.setAttribute('stroke', '#6b7280');
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('fill', 'none');
+                path.classList.add('connector-path');
 
-            homeBtn.addEventListener('click', () => {
-                navigationBar.style.display = 'none';
-                currentPath = '';
-                pathSlides = [];
-                allSlides.forEach(slide => slide.classList.remove('active'));
-                document.querySelector('.slide[data-path="home"]').classList.add('active');
-            });
-
-            prevBtn.addEventListener('click', () => {
-                if (currentSlideIndex > 0) {
-                    currentSlideIndex--;
-                    showSlide(currentSlideIndex);
+                if (match.classList.contains('match-completed')) {
+                    path.classList.add('winner-path');
                 }
+                svg.appendChild(path);
             });
-
-            nextBtn.addEventListener('click', () => {
-                if (currentSlideIndex < pathSlides.length - 1) {
-                    currentSlideIndex++;
-                    showSlide(currentSlideIndex);
-                }
-            });
-            
-            // Quiz Logic
-            const choice1_1 = document.getElementById('choice1-1');
-            const choice1_2 = document.getElementById('choice1-2');
-            const feedback1 = document.getElementById('feedback1');
-            choice1_1.addEventListener('click', () => {
-                feedback1.textContent = 'Incorrecto. Los archivos críticos del equipo siempre van en Unidades Compartidas.';
-                feedback1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
-            });
-            choice1_2.addEventListener('click', () => {
-                feedback1.textContent = '¡Correcto! Los archivos que pertenecen al equipo deben vivir en la Unidad Compartida.';
-                feedback1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
-            });
-
-            const choice2_1 = document.getElementById('choice2-1');
-            const choice2_2 = document.getElementById('choice2-2');
-            const feedback2 = document.getElementById('feedback2');
-            choice2_1.addEventListener('click', () => {
-                feedback2.textContent = 'Incorrecto. Mover el archivo le quita el acceso a todo el equipo.';
-                feedback2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
-            });
-            choice2_2.addEventListener('click', () => {
-                feedback2.textContent = '¡Correcto! El atajo te da acceso rápido sin afectar al equipo.';
-                feedback2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
-            });
-
-            const choice_leader_1 = document.getElementById('choice_leader_1');
-            const choice_leader_2 = document.getElementById('choice_leader_2');
-            const feedback_leader_1 = document.getElementById('feedback_leader_1');
-            choice_leader_1.addEventListener('click', () => {
-                feedback_leader_1.textContent = 'Incorrecto. El rol de Colaborador le permitiría editar archivos.';
-                feedback_leader_1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
-            });
-            choice_leader_2.addEventListener('click', () => {
-                feedback_leader_1.textContent = '¡Correcto! El rol de Comentarista es el ideal para este caso.';
-                feedback_leader_1.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
-            });
-
-            const choice_leader_2_1 = document.getElementById('choice_leader_2_1');
-            const choice_leader_2_2 = document.getElementById('choice_leader_2_2');
-            const feedback_leader_2 = document.getElementById('feedback_leader_2');
-            choice_leader_2_1.addEventListener('click', () => {
-                feedback_leader_2.textContent = 'Incorrecto. Un borrador puede permanecer en "Mi Unidad". Forzar el movimiento puede interrumpir el flujo de trabajo.';
-                feedback_leader_2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-red-100 text-red-800';
-            });
-            choice_leader_2_2.addEventListener('click', () => {
-                feedback_leader_2.textContent = '¡Correcto! Es la mejor acción. Respeta el espacio del borrador pero asegura que la versión final se mueva al lugar correcto.';
-                feedback_leader_2.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
-            });
+            svg.setAttribute('width', bracket.scrollWidth);
+            svg.setAttribute('height', bracket.scrollHeight);
+        }
+        
+        // --- INITIALIZATION ---
+        window.addEventListener('load', () => {
+            loadState();
+            drawConnectors();
+            resizeCanvas();
+            bracketContainer.scrollLeft = (bracketContainer.scrollWidth - bracketContainer.clientWidth) / 2;
+        });
+        window.addEventListener('resize', () => {
+            drawConnectors();
+            resizeCanvas();
         });
     </script>
-
 </body>
 </html>
